@@ -9,6 +9,7 @@
 #import "TiBase.h"
 #import "TiHost.h"
 #import "TiUtils.h"
+#import "TiApp.h"
 #import "TiFilesystemFileProxy.h"
 #import <CommonCrypto/CommonDigest.h>
 
@@ -107,6 +108,14 @@
                                               NSArray *invocationArray = [NSArray arrayWithObjects:&event count:1];
                                               [callback call:invocationArray thisObject:self];
                                           }];
+	
+    // Supress the confirmation dialog (via http://bonney.io/2017/05/set-application-icon-ios/). 
+    // Can cause memory-leaks and app-rejections.
+    UIViewController *VC = [UIViewController new];
+
+    [[[TiApp app] controller] topPresentedController] presentViewController:VC animated:NO completion:^{
+        [VC dismissViewControllerAnimated:NO completion:nil];
+    }];
 #else
     if (callback != nil) {
         NSDictionary *event = @{@"success": NUMBOOL(NO), @"error": @"This feature is only available on iOS 10.3 and later."};
